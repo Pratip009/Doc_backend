@@ -482,6 +482,97 @@ export interface PluginUploadFolder extends Schema.CollectionType {
   };
 }
 
+export interface PluginContentReleasesRelease extends Schema.CollectionType {
+  collectionName: 'strapi_releases';
+  info: {
+    singularName: 'release';
+    pluralName: 'releases';
+    displayName: 'Release';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  pluginOptions: {
+    'content-manager': {
+      visible: false;
+    };
+    'content-type-builder': {
+      visible: false;
+    };
+  };
+  attributes: {
+    name: Attribute.String & Attribute.Required;
+    releasedAt: Attribute.DateTime;
+    actions: Attribute.Relation<
+      'plugin::content-releases.release',
+      'oneToMany',
+      'plugin::content-releases.release-action'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'plugin::content-releases.release',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'plugin::content-releases.release',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface PluginContentReleasesReleaseAction
+  extends Schema.CollectionType {
+  collectionName: 'strapi_release_actions';
+  info: {
+    singularName: 'release-action';
+    pluralName: 'release-actions';
+    displayName: 'Release Action';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  pluginOptions: {
+    'content-manager': {
+      visible: false;
+    };
+    'content-type-builder': {
+      visible: false;
+    };
+  };
+  attributes: {
+    type: Attribute.Enumeration<['publish', 'unpublish']> & Attribute.Required;
+    entry: Attribute.Relation<
+      'plugin::content-releases.release-action',
+      'morphToOne'
+    >;
+    contentType: Attribute.String & Attribute.Required;
+    release: Attribute.Relation<
+      'plugin::content-releases.release-action',
+      'manyToOne',
+      'plugin::content-releases.release'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'plugin::content-releases.release-action',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'plugin::content-releases.release-action',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface PluginI18NLocale extends Schema.CollectionType {
   collectionName: 'i18n_locale';
   info: {
@@ -631,7 +722,6 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
   };
   options: {
     draftAndPublish: false;
-    timestamps: true;
   };
   attributes: {
     username: Attribute.String &
@@ -660,6 +750,16 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.role'
     >;
+    doctor: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToOne',
+      'api::doctor.doctor'
+    >;
+    availability: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToOne',
+      'api::availability.availability'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -677,39 +777,87 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
   };
 }
 
-export interface ApiAppointmentAppointment extends Schema.CollectionType {
-  collectionName: 'appointments';
+export interface ApiAreaArea extends Schema.CollectionType {
+  collectionName: 'areas';
   info: {
-    singularName: 'appointment';
-    pluralName: 'appointments';
-    displayName: 'Appointment';
+    singularName: 'area';
+    pluralName: 'areas';
+    displayName: 'Area';
     description: '';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    UserName: Attribute.String & Attribute.Required;
-    Date: Attribute.String & Attribute.Required;
-    Time: Attribute.String & Attribute.Required;
-    Email: Attribute.Email & Attribute.Required;
-    hospitals: Attribute.Relation<
-      'api::appointment.appointment',
-      'oneToOne',
+    Location: Attribute.String;
+    City: Attribute.String;
+    PIN: Attribute.Integer;
+    State: Attribute.String;
+    areas: Attribute.Relation<
+      'api::area.area',
+      'manyToMany',
+      'api::doctor.doctor'
+    >;
+    availabilities: Attribute.Relation<
+      'api::area.area',
+      'oneToMany',
+      'api::availability.availability'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::area.area', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::area.area', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiAvailabilityAvailability extends Schema.CollectionType {
+  collectionName: 'availabilities';
+  info: {
+    singularName: 'availability';
+    pluralName: 'availabilities';
+    displayName: 'Availability';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    doctor: Attribute.Relation<
+      'api::availability.availability',
+      'manyToOne',
+      'api::doctor.doctor'
+    >;
+    day: Attribute.Relation<
+      'api::availability.availability',
+      'manyToOne',
+      'api::day.day'
+    >;
+    area: Attribute.Relation<
+      'api::availability.availability',
+      'manyToOne',
+      'api::area.area'
+    >;
+    hospital: Attribute.Relation<
+      'api::availability.availability',
+      'manyToOne',
       'api::hospital.hospital'
     >;
-    note: Attribute.Text & Attribute.Required;
+    StartTime: Attribute.Time;
+    EndTime: Attribute.Time;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
-      'api::appointment.appointment',
+      'api::availability.availability',
       'oneToOne',
       'admin::user'
     > &
       Attribute.Private;
     updatedBy: Attribute.Relation<
-      'api::appointment.appointment',
+      'api::availability.availability',
       'oneToOne',
       'admin::user'
     > &
@@ -754,6 +902,50 @@ export interface ApiCategoryCategory extends Schema.CollectionType {
   };
 }
 
+export interface ApiDayDay extends Schema.CollectionType {
+  collectionName: 'days';
+  info: {
+    singularName: 'day';
+    pluralName: 'days';
+    displayName: 'day';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    Day: Attribute.String;
+    DayOfWeek: Attribute.Enumeration<
+      [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ]
+    >;
+    availabilities: Attribute.Relation<
+      'api::day.day',
+      'oneToMany',
+      'api::availability.availability'
+    >;
+    availabilitiesday: Attribute.Relation<
+      'api::day.day',
+      'oneToMany',
+      'api::availability.availability'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::day.day', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::day.day', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
 export interface ApiDoctorDoctor extends Schema.CollectionType {
   collectionName: 'doctors';
   info: {
@@ -770,15 +962,40 @@ export interface ApiDoctorDoctor extends Schema.CollectionType {
     Address: Attribute.String & Attribute.Required;
     Patients: Attribute.String & Attribute.Required;
     Year_of_Experience: Attribute.String & Attribute.Required;
-    StartTime: Attribute.Date & Attribute.Required;
-    EndTime: Attribute.Date;
+    Image: Attribute.Media & Attribute.Required;
+    About: Attribute.Text & Attribute.Required;
     categories: Attribute.Relation<
       'api::doctor.doctor',
       'oneToMany',
       'api::category.category'
     >;
-    Image: Attribute.Media & Attribute.Required;
-    About: Attribute.Text & Attribute.Required;
+    user: Attribute.Relation<
+      'api::doctor.doctor',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    > &
+      Attribute.Unique;
+    Registration: Attribute.String & Attribute.Required;
+    Fees: Attribute.String;
+    hospitals: Attribute.Relation<
+      'api::doctor.doctor',
+      'manyToMany',
+      'api::hospital.hospital'
+    >;
+    days: Attribute.Relation<'api::doctor.doctor', 'oneToMany', 'api::day.day'>;
+    Speciality: Attribute.String;
+    Schedule: Attribute.Text;
+    availabilities: Attribute.Relation<
+      'api::doctor.doctor',
+      'oneToMany',
+      'api::availability.availability'
+    >;
+    areas: Attribute.Relation<
+      'api::doctor.doctor',
+      'manyToMany',
+      'api::area.area'
+    >;
+    Email: Attribute.Email;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -790,6 +1007,56 @@ export interface ApiDoctorDoctor extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::doctor.doctor',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiDoctorsAppointmentDoctorsAppointment
+  extends Schema.CollectionType {
+  collectionName: 'doctors_appointments';
+  info: {
+    singularName: 'doctors-appointment';
+    pluralName: 'doctors-appointments';
+    displayName: 'DoctorsAppointment';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    UserName: Attribute.String;
+    Email: Attribute.Email;
+    doctor: Attribute.Relation<
+      'api::doctors-appointment.doctors-appointment',
+      'oneToOne',
+      'api::doctor.doctor'
+    >;
+    note: Attribute.Text;
+    address: Attribute.Text;
+    area: Attribute.String;
+    day: Attribute.String;
+    hospital: Attribute.Relation<
+      'api::doctors-appointment.doctors-appointment',
+      'oneToOne',
+      'api::hospital.hospital'
+    >;
+    Time: Attribute.String;
+    date: Attribute.String;
+    status: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::doctors-appointment.doctors-appointment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::doctors-appointment.doctors-appointment',
       'oneToOne',
       'admin::user'
     > &
@@ -822,6 +1089,32 @@ export interface ApiHospitalHospital extends Schema.CollectionType {
       'api::category.category'
     >;
     Description: Attribute.Text & Attribute.Required;
+    doctors: Attribute.Relation<
+      'api::hospital.hospital',
+      'oneToMany',
+      'api::doctor.doctor'
+    >;
+    area: Attribute.Relation<
+      'api::hospital.hospital',
+      'oneToOne',
+      'api::area.area'
+    >;
+    docs: Attribute.Relation<
+      'api::hospital.hospital',
+      'oneToMany',
+      'api::doctor.doctor'
+    >;
+    chembers: Attribute.Relation<
+      'api::hospital.hospital',
+      'manyToMany',
+      'api::doctor.doctor'
+    >;
+    availabilities: Attribute.Relation<
+      'api::hospital.hospital',
+      'oneToMany',
+      'api::availability.availability'
+    >;
+    GoogleMapsURL: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -833,6 +1126,133 @@ export interface ApiHospitalHospital extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::hospital.hospital',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiHospitalAppointmentHospitalAppointment
+  extends Schema.CollectionType {
+  collectionName: 'hospital_appointments';
+  info: {
+    singularName: 'hospital-appointment';
+    pluralName: 'hospital-appointments';
+    displayName: 'HospitalAppointment';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    UserName: Attribute.String;
+    note: Attribute.String;
+    name: Attribute.String;
+    age: Attribute.Integer;
+    address: Attribute.String;
+    Email: Attribute.Email;
+    doctor: Attribute.Relation<
+      'api::hospital-appointment.hospital-appointment',
+      'oneToOne',
+      'api::doctor.doctor'
+    >;
+    hospital: Attribute.Relation<
+      'api::hospital-appointment.hospital-appointment',
+      'oneToOne',
+      'api::hospital.hospital'
+    >;
+    Time: Attribute.String;
+    Date: Attribute.String;
+    status: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::hospital-appointment.hospital-appointment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::hospital-appointment.hospital-appointment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiReportReport extends Schema.CollectionType {
+  collectionName: 'reports';
+  info: {
+    singularName: 'report';
+    pluralName: 'reports';
+    displayName: 'Report';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    Subject: Attribute.String;
+    description: Attribute.Text;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::report.report',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::report.report',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiScheduleSchedule extends Schema.CollectionType {
+  collectionName: 'schedules';
+  info: {
+    singularName: 'schedule';
+    pluralName: 'schedules';
+    displayName: 'Schedule';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    area: Attribute.Relation<
+      'api::schedule.schedule',
+      'oneToOne',
+      'api::area.area'
+    >;
+    hospital: Attribute.Relation<
+      'api::schedule.schedule',
+      'oneToOne',
+      'api::hospital.hospital'
+    >;
+    day: Attribute.Relation<
+      'api::schedule.schedule',
+      'oneToOne',
+      'api::day.day'
+    >;
+    Stime: Attribute.Time;
+    eTime: Attribute.Time;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::schedule.schedule',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::schedule.schedule',
       'oneToOne',
       'admin::user'
     > &
@@ -883,14 +1303,22 @@ declare module '@strapi/types' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
+      'plugin::content-releases.release': PluginContentReleasesRelease;
+      'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
-      'api::appointment.appointment': ApiAppointmentAppointment;
+      'api::area.area': ApiAreaArea;
+      'api::availability.availability': ApiAvailabilityAvailability;
       'api::category.category': ApiCategoryCategory;
+      'api::day.day': ApiDayDay;
       'api::doctor.doctor': ApiDoctorDoctor;
+      'api::doctors-appointment.doctors-appointment': ApiDoctorsAppointmentDoctorsAppointment;
       'api::hospital.hospital': ApiHospitalHospital;
+      'api::hospital-appointment.hospital-appointment': ApiHospitalAppointmentHospitalAppointment;
+      'api::report.report': ApiReportReport;
+      'api::schedule.schedule': ApiScheduleSchedule;
       'api::slider.slider': ApiSliderSlider;
     }
   }

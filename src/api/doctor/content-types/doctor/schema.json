@@ -28,19 +28,6 @@
       "type": "string",
       "required": true
     },
-    "StartTime": {
-      "type": "date",
-      "required": true
-    },
-    "EndTime": {
-      "type": "date",
-      "required": false
-    },
-    "categories": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::category.category"
-    },
     "Image": {
       "type": "media",
       "multiple": false,
@@ -55,6 +42,56 @@
     "About": {
       "type": "text",
       "required": true
+    },
+    "categories": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::category.category"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "unique": true
+    },
+    "Registration": {
+      "type": "string",
+      "required": true
+    },
+    "Fees": {
+      "type": "string"
+    },
+    "hospitals": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::hospital.hospital",
+      "inversedBy": "chembers"
+    },
+    "days": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::day.day"
+    },
+    "Speciality": {
+      "type": "string"
+    },
+    "Schedule": {
+      "type": "text"
+    },
+    "availabilities": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::availability.availability",
+      "mappedBy": "doctor"
+    },
+    "areas": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::area.area",
+      "mappedBy": "areas"
+    },
+    "Email": {
+      "type": "email"
     }
   }
 }

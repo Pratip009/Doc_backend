@@ -1,0 +1,53 @@
+{
+  "kind": "collectionType",
+  "collectionName": "doctors_appointments",
+  "info": {
+    "singularName": "doctors-appointment",
+    "pluralName": "doctors-appointments",
+    "displayName": "DoctorsAppointment",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "UserName": {
+      "type": "string"
+    },
+    "Email": {
+      "type": "email"
+    },
+    "doctor": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::doctor.doctor"
+    },
+    "note": {
+      "type": "text"
+    },
+    "address": {
+      "type": "text"
+    },
+    "area": {
+      "type": "string"
+    },
+    "day": {
+      "type": "string"
+    },
+    "hospital": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::hospital.hospital"
+    },
+    "Time": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    }
+  }
+}
